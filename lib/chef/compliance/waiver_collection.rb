@@ -53,16 +53,21 @@ class Chef
         select(&:enabled?).each_with_object([]) { |waiver, arry| arry << waiver.for_inspec }
       end
 
-      # DSL method to enable waiver files.  This matches on the name of the control being waived, it
-      # does not match on the filename of the waiver file.
+      # DSL method to enable waiver files.  This matches on the filename of the waiver file.
+      # If the specific waiver is omitted then it uses the default waiver. The string
+      # supports regular expresion matching.
       #
       # @example Specific waiver file in a cookbook
       #
       # include_waiver "acme_cookbook::ssh-001"
       #
-      # @example Every waiver file in a cookbook
+      # @example The compliance/waiver/default.rb waiver file in a cookbook
       #
       # include_waiver "acme_cookbook"
+      #
+      # @example Every waiver file in a cookbook
+      #
+      # include_waiver "acme_cookbook::.*"
       #
       # @example Matching waivers by regexp in a cookbook
       #

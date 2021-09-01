@@ -53,16 +53,21 @@ class Chef
         select(&:enabled?).each_with_object([]) { |input, arry| arry << input.for_inspec }
       end
 
-      # DSL method to enable input files.  This matches on the name of the control being waived, it
-      # does not match on the filename of the input file.
+      # DSL method to enable input files.  This matches on the filename of the input file.
+      # If the specific input is omitted then it uses the default input. The string
+      # supports regular expresion matching.
       #
       # @example Specific input file in a cookbook
       #
       # include_input "acme_cookbook::ssh-001"
       #
-      # @example Every input file in a cookbook
+      # @example The compliance/inputs/default.yml input in a cookbook
       #
       # include_input "acme_cookbook"
+      #
+      # @example Every input file in a cookbook
+      #
+      # include_input "acme_cookbook::.*"
       #
       # @example Matching inputs by regexp in a cookbook
       #

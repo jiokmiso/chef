@@ -56,16 +56,21 @@ class Chef
         select(&:enabled?).each_with_object([]) { |profile, arry| arry << profile.for_inspec }
       end
 
-      # DSL method to enable profiles.  This matches on the name of the profile, it does not match on
-      # the filename of the profile.
+      # DSL method to enable profile files.  This matches on the name of the profile being included it
+      # does not match on the filename of the input file.  If the specific profile is omitted then
+      # it uses the default profile. The string supports regular expresion matching.
       #
       # @example Specific profile in a cookbook
       #
       # include_profile "acme_cookbook::ssh-001"
       #
-      # @example Every profile in a cookbook
+      # @example The profile named "default" in a cookbook
       #
       # include_profile "acme_cookbook"
+      #
+      # @example Every profile in a cookbook
+      #
+      # include_profile "acme_cookbook::.*"
       #
       # @example Matching profiles by regexp in a cookbook
       #
