@@ -395,12 +395,12 @@ class Chef
       end
 
       # Called when a compliance profile is enabled (by include_profile)
-      def compliance_profile_enabled(cookbook_name, pathname, name, path)
+      def compliance_profile_enabled(profile)
         # puts_line("  * FIXME", :cyan)
       end
 
       # Called when a compliance waiver is enabled (by include_waiver)
-      def compliance_waiver_enabled(cookbook_name, pathname, path)
+      def compliance_waiver_enabled(waiver)
         # puts_line("  * FIXME", :cyan)
       end
 

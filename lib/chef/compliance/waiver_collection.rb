@@ -26,12 +26,8 @@ class Chef
       #
       attr_reader :events
 
-      # @return [Hash] Hash of raw values (not from files)
-      attr_reader :raw_hash
-
       def initialize(events)
         @events = events
-        @raw_hash = {}
       end
 
       # Add a waiver to the waiver collection.  The cookbook_name needs to be determined by the
@@ -45,6 +41,17 @@ class Chef
         new_waiver = Waiver.from_file(events, filename, cookbook_name)
         self << new_waiver
         events.compliance_waiver_loaded(cookbook_name, new_waiver.pathname, filename)
+      end
+
+      # Add a waiver from a raw hash.  This waiver will be enabled by default.
+      #
+      # @param path [String]
+      # @param cookbook_name [String]
+      #
+      def from_hash(hash)
+        new_waiver = Waiver.from_hash(events, hash)
+        new_waiver.enable!
+        self << new_waiver
       end
 
       # @return [Array<Waiver>] inspec waivers which are enabled in a form suitable to pass to inspec
@@ -80,9 +87,9 @@ class Chef
       def include_waiver(arg)
         raise "include_waiver was given a nil value" if arg.nil?
 
-        # if we're given a hash argument just shove it in the raw_hash
+        # if we're given a hash argument just shove it in the collection
         if arg.is_a?(Hash)
-          raw_hash.merge!(arg)
+          from_hash(arg)
           return
         end
 

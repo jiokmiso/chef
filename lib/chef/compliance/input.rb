@@ -19,24 +19,31 @@ require "yaml"
 
 class Chef
   module Compliance
+    #
+    # Chef object that represents a single input file in the compliance segment
+    # of a cookbook.
+    #
     class Input
       # @return [Boolean] if the input has been enabled
-      attr_accessor :enabled
+      attr_reader :enabled
 
       # @return [String] The name of the cookbook that the input is in
-      attr_accessor :cookbook_name
+      attr_reader :cookbook_name
 
       # @return [String] The full path on the host to the input yml file
-      attr_accessor :path
+      attr_reader :path
 
       # @return [String] the pathname in the cookbook
-      attr_accessor :pathname
+      attr_reader :pathname
 
       # Event dispatcher for this run.
       #
       # @return [Chef::EventDispatch::Dispatcher]
       #
-      attr_accessor :events
+      attr_reader :events
+
+      # @api private
+      attr_reader :data
 
       def initialize(events, data, path, cookbook_name)
         @events = events

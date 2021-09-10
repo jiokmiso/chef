@@ -33,6 +33,9 @@ class Chef
       # @return [Chef::EventDispatch::Dispatcher] Event dispatcher for this run.
       attr_reader :events
 
+      # @api private
+      attr_reader :data
+
       def initialize(events, data, path, cookbook_name)
         @events = events
         @data = data
@@ -67,7 +70,7 @@ class Chef
       # Set the profile to being enabled
       #
       def enable!
-        events.compliance_profile_enabled(cookbook_name, pathname, name, path)
+        events.compliance_profile_enabled(self)
         @enabled = true
       end
 

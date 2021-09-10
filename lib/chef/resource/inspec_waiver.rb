@@ -45,6 +45,52 @@ class Chef
           action :add
         end
       ```
+
+      **Add an InSpec waiver to the Compliance Phase using an arbitrary YAML, JSON or TOML file**:
+
+      ```ruby
+        # files ending in .yml or .yaml that exist are parsed as YAML
+        inspec_waiver "/path/to/my/waiver.yml"
+
+        inspec_waiver "my-waiver-name" do
+          source "/path/to/my/waiver.yml"
+        end
+
+        # files ending in .json that exist are parsed as JSON
+        inspec_waiver "/path/to/my/waiver.json"
+
+        inspec_waiver "my-waiver-name" do
+          source "/path/to/my/waiver.json"
+        end
+
+        # files ending in .toml that exist are parsed as TOML
+        inspec_waiver "/path/to/my/waiver.toml"
+
+        inspec_waiver "my-waiver-name" do
+          source "/path/to/my/waiver.toml"
+        end
+      ```
+
+      **Add an InSpec waiver to the Compliance Phase using a hash**:
+
+      ```ruby
+        my_hash = { "ssh-01" => {
+          "expiration_date" => "2033-07-31",
+          "run" => false,
+          "justification" => "because"
+        } }
+
+        inspec_waiver "my-waiver-name" do
+          source my_hash
+        end
+      ```
+
+      Note that the inspec_waiver resource does not update and will not fire notfications (similar to the log resource).  This is done to preserve the ability to use
+      the resource while not causing the updated resource count to be larger than zero.  Since the resource does not update the state of the node being managed this
+      behavior is still consistent with the configuration management model.  Events should be used to observe configuration changes for the compliance phase.  It is
+      possible to use the `notify_group` resource to chain notifications of the two resources, but notifications are the wrong model to use and pure ruby conditionals
+      should be used instead.  Compliance configuration should be independent of other resources and should only be made conditional based on state/attributes not
+      on other resources.
       DOC
 
       property :control, String,
@@ -72,7 +118,7 @@ class Chef
 
       property :source, [ Hash, String ]
 
-      action :add do
+      action :add, description: "Add a waiver to the compliance phase" do
         if run_context.waiver_collection.valid?(new_resource.control)
           include_waiver(new_resource.control)
         else
@@ -87,14 +133,15 @@ class Chef
         #
         # @api private
         def source
-          @source ||=
-            begin
-              return new_resource.source unless new_resource.source.nil?
-              return nil unless new_resource.control.count(::File::SEPARATOR) > 0 || (::File::ALT_SEPARATOR && new_resource.control.count(::File::ALT_SEPARATOR) > 0 )
-              return nil unless ::File.exist?(new_resource.control)
+          @source ||= build_source
+        end
 
-              new_resource.control
-            end
+        def build_source
+          return new_resource.source unless new_resource.source.nil?
+          return nil unless new_resource.control.count(::File::SEPARATOR) > 0 || (::File::ALT_SEPARATOR && new_resource.control.count(::File::ALT_SEPARATOR) > 0 )
+          return nil unless ::File.exist?(new_resource.control)
+
+          new_resource.control
         end
 
         def waiver_hash

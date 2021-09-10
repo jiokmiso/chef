@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-autoload :TOML, "toml"
+autoload :TOML, "tomlrb"
 require_relative "../json_compat"
 autoload :YAML, "yaml"
 
@@ -38,7 +38,7 @@ class Chef
       end
 
       def parse_toml(filename)
-        TOML.load_file(filename)
+        Tomlrb.load_file(filename)
       end
 
       def parse_yaml(filename)

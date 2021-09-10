@@ -213,7 +213,7 @@ class Chef
       def compliance_profile_enabled(cookbook_name, pathname, name, path); end
 
       # Called when a compliance waiver is enabled (by include_waiver)
-      def compliance_waiver_enabled(cookbook_name, pathanme, path); end
+      def compliance_waiver_enabled(waiver); end
 
       # Called when a compliance waiver is enabled (by include_input)
       def compliance_input_enabled(cookbook_name, pathanme, path); end

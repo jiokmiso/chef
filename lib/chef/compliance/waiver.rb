@@ -19,18 +19,25 @@ require "yaml"
 
 class Chef
   module Compliance
+    #
+    # Chef object that reprsents a single waiver file in the compliance
+    # segment of a cookbook
+    #
     class Waiver
       # @return [Boolean] if the waiver has been enabled
-      attr_accessor :enabled
+      attr_reader :enabled
 
       # @return [String] The name of the cookbook that the waiver is in
-      attr_accessor :cookbook_name
+      attr_reader :cookbook_name
 
       # @return [String] The full path on the host to the waiver yml file
-      attr_accessor :path
+      attr_reader :path
 
       # @return [String] the pathname in the cookbook
-      attr_accessor :pathname
+      attr_reader :pathname
+
+      # @api private
+      attr_reader :data
 
       # Event dispatcher for this run.
       #
@@ -43,7 +50,7 @@ class Chef
         @data = data
         @cookbook_name = cookbook_name
         @path = path
-        @pathname = File.basename(path, File.extname(path))
+        @pathname = File.basename(path, File.extname(path)) unless path.nil?
         disable!
       end
 
@@ -56,7 +63,7 @@ class Chef
       # Set the waiver to being enabled
       #
       def enable!
-        events.compliance_waiver_enabled(cookbook_name, pathname, path)
+        events.compliance_waiver_enabled(self)
         @enabled = true
       end
 
@@ -86,21 +93,21 @@ class Chef
       # Helper to construct a waiver object from a hash.  Since the path and
       # cookbook_name are required this is probably not externally useful.
       #
-      def self.from_hash(events, hash, path, cookbook_name)
+      def self.from_hash(events, hash, path = nil, cookbook_name = nil)
         new(events, hash, path, cookbook_name)
       end
 
       # Helper to construct a waiver object from a yaml string.  Since the path
       # and cookbook_name are required this is probably not externally useful.
       #
-      def self.from_yaml(events, string, path, cookbook_name)
+      def self.from_yaml(events, string, path = nil, cookbook_name = nil)
         from_hash(events, YAML.load(string), path, cookbook_name)
       end
 
       # @param filename [String] full path to the yml file in the cookbook
       # @param cookbook_name [String] cookbook that the waiver is in
       #
-      def self.from_file(events, filename, cookbook_name)
+      def self.from_file(events, filename, cookbook_name = nil)
         from_yaml(events, IO.read(filename), filename, cookbook_name)
       end
     end
