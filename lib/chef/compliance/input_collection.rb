@@ -26,12 +26,8 @@ class Chef
       #
       attr_reader :events
 
-      # @return [Hash] Hash of raw values (not from files)
-      attr_reader :raw_hash
-
       def initialize(events)
         @events = events
-        @raw_hash = {}
       end
 
       # Add a input to the input collection.  The cookbook_name needs to be determined by the
@@ -45,6 +41,17 @@ class Chef
         new_input = Input.from_file(events, filename, cookbook_name)
         self << new_input
         events.compliance_input_loaded(cookbook_name, new_input.pathname, filename)
+      end
+
+      # Add a input from a raw hash.  This input will be enabled by default.
+      #
+      # @param path [String]
+      # @param cookbook_name [String]
+      #
+      def from_hash(hash)
+        new_input = Input.from_hash(events, hash)
+        new_input.enable!
+        self << new_input
       end
 
       # @return [Array<Input>] inspec inputs which are enabled in a form suitable to pass to inspec
@@ -82,7 +89,7 @@ class Chef
 
         # if we're given a hash argument just shove it in the raw_hash
         if arg.is_a?(Hash)
-          raw_hash.merge!(arg)
+          from_hash(arg)
           return
         end
 

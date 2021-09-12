@@ -50,7 +50,7 @@ class Chef
         @data = data
         @cookbook_name = cookbook_name
         @path = path
-        @pathname = File.basename(path, File.extname(path))
+        @pathname = File.basename(path, File.extname(path)) unless path.nil?
         disable!
       end
 
@@ -93,21 +93,21 @@ class Chef
       # Helper to construct a input object from a hash.  Since the path and
       # cookbook_name are required this is probably not externally useful.
       #
-      def self.from_hash(events, hash, path, cookbook_name)
+      def self.from_hash(events, hash, path = nil, cookbook_name = nil)
         new(events, hash, path, cookbook_name)
       end
 
       # Helper to construct a input object from a yaml string.  Since the path
       # and cookbook_name are required this is probably not externally useful.
       #
-      def self.from_yaml(events, string, path, cookbook_name)
+      def self.from_yaml(events, string, path = nil, cookbook_name = nil)
         from_hash(events, YAML.load(string), path, cookbook_name)
       end
 
       # @param filename [String] full path to the yml file in the cookbook
       # @param cookbook_name [String] cookbook that the input is in
       #
-      def self.from_file(events, filename, cookbook_name)
+      def self.from_file(events, filename, cookbook_name = nil)
         from_yaml(events, IO.read(filename), filename, cookbook_name)
       end
     end

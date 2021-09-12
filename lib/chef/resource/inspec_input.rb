@@ -66,7 +66,7 @@ class Chef
       property :source, [ Hash, String ],
         name_property: true
 
-      action :add do
+      action :add, description: "Add an input to the compliance phase" do
         if run_context.input_collection.valid?(new_resource.source)
           include_input(new_resource.source)
         else
