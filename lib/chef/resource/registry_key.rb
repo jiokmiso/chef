@@ -150,13 +150,14 @@ class Chef
       # may want to extend the state_attrs API with the ability to rename POST'd attrs.
       #
       # See lib/chef/resource_reporter.rb for more information.
+      @unscrubbed_values = []
       attr_reader :unscrubbed_values
 
       VALID_VALUE_HASH_KEYS = %i{name type data}.freeze
 
       property :key, String, name_property: true
 
-      property :values, [Hash, Array],
+      property :values, [Hash, Array, nil],
         default: [],
         coerce: proc { |v|
           case v
@@ -165,7 +166,7 @@ class Chef
           when Array
             @unscrubbed_values = v.map { |value| Mash.new(value).symbolize_keys }
           else
-            raise ArgumentError, "Bad type for RegistryKey resource, use Hash or Array"
+            raise ArgumentError, "Bad type for RegistryKey resource, use Hash or Array" unless v.nil?
           end
           scrub_values(@unscrubbed_values)
         },
